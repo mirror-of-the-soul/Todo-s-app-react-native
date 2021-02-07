@@ -1,16 +1,38 @@
 import React, {useState} from 'react';
-import {StyleSheet, Text, View, FlatList, Alert} from 'react-native';
+import {StyleSheet, View, Alert} from 'react-native';
+// import *(все) для загрузки шрифтов
+import * as Font from 'expo-font';
+import AppLoading  from 'expo-app-loading';
+
+
 import {Navbar} from './src/components/Navbar';
 import {MainScreen} from './src/screens/MainScreen';
 import {TodoScreen} from './src/screens/TodoScreen';
 
+// загрузка шрифтов
+async function loadApplication () {
+  await Font.loadAsync({
+    'roboto-regular': require('./assets/fonts/Roboto-Regular.ttf'),
+    'roboto-bold': require('./assets/fonts/Roboto-Bold.ttf')
+  })
+}
 
 export default function App() {
-  const [todoId, setTodoId] = useState('2')
+  const [isReady, setIsReady] = useState(false)
+  const [todoId, setTodoId] = useState(null)
   const [todos, setTodos] = useState([
-    {id: '1', title: 'Learn React Native'},
-    {id: '2', title: 'Create application'},
+    {id: '1', title: 'Learn React Native'}
   ])
+
+  if (!isReady) {
+    return (
+      <AppLoading
+        startAsync={loadApplication}
+        onError={err => console.log(err)}
+        onFinish={() => setIsReady(true)}
+      />
+    )
+  }
 
   const addTodo = (title) => {
     setTodos(prev => [
@@ -26,7 +48,7 @@ export default function App() {
     const todo = todos.find(t => t.id === id)
     Alert.alert(
       'Удаление элемента',
-      `Вы уверенны, что хотите удалить "${todo.title}"?`,
+      `Вы уверенны, что хотите удалить задачу: "${todo.title}"?`,
       [
         {
           text: 'Отмена',
